@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 from flask_cors import CORS
 import requests
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 CORS(app)
@@ -12,6 +13,28 @@ chrome_options = Options()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 # Update this with the path to your chromedriver
+
+
+def get_next_prayer_countdown(current_time, prayer_timings):
+    # Parse current time
+    current_time_obj = datetime.strptime(current_time, "%H:%M:%S WIB")
+
+    # Find the next prayer and its time difference
+    min_diff = None
+    next_prayer = None
+
+    for prayer, time in prayer_timings.items():
+        # Parse prayer time
+        prayer_time_obj = datetime.strptime(time.split()[0], "%H:%M")
+
+        # If the prayer time is in the future
+        if current_time_obj < prayer_time_obj:
+            time_diff = prayer_time_obj - current_time_obj
+            if not min_diff or time_diff < min_diff:
+                min_diff = time_diff
+                next_prayer = prayer
+
+    return next_prayer, min_diff
 
 
 @app.route('/times', methods=['GET'])
@@ -46,6 +69,9 @@ def times():
     else:
         return jsonify({'error': 'Could not fetch data'}), 500
 
+    next_prayer, countdown = get_next_prayer_countdown(
+        indonesian_time.strip(), prayer_timings)
+
     return jsonify({
         'indonesian_date': indonesian_date.strip(),
         'indonesian_time': indonesian_time.strip(),
@@ -53,7 +79,9 @@ def times():
         'wit_time': other_times[1].text.strip(),
         'english_date': english_date.strip(),
         'utc_time': utc_time.strip(),
-        'prayer_times': prayer_timings
+        'prayer_times': prayer_timings,
+        'next_prayer': next_prayer,
+        'countdown': str(countdown)
     })
 
 
