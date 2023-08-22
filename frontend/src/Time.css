@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ruwudu-font {
+  font-family: "Ruwudu", sans-serif;
+}
+
+@font-face {
+  font-family: "DS-Digital";
+  src: url("./fonts/DS-DIGI.TTF") format("truetype");
+}
+
+.date-time-information {
+  font-family: "DS-Digital", sans-serif; /* Use a fallback font like 'sans-serif' in case the custom font doesn't load */
+}
