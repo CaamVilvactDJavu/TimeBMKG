@@ -15,6 +15,17 @@ chrome_options.add_argument("--disable-gpu")
 # Update this with the path to your chromedriver
 
 
+def hijri_month_name(month_number):
+    hijri_months = [
+        "Muharram", "Safar", "Rabi' al-awwal", "Rabi' al-Thani", "Jumada al-awwal",
+        "Jumada al-Thani", "Rajab", "Sha'ban", "Ramadan", "Shawwal", "Dhul-Qi'dah", "Dhul-Hijjah"
+    ]
+    try:
+        return hijri_months[int(month_number) - 1]
+    except (ValueError, IndexError):
+        return ''
+
+
 def get_next_prayer_countdown(current_time, prayer_timings):
     # Parse current time
     current_time_obj = datetime.strptime(current_time, "%H:%M:%S WIB")
@@ -72,8 +83,14 @@ def times():
     next_prayer, countdown = get_next_prayer_countdown(
         indonesian_time.strip(), prayer_timings)
 
+    hijri_raw = response.json().get('data', {}).get(
+        'date', {}).get('hijri', {}).get('date', '')
+    day, month, year = hijri_raw.split('-')
+    hijri_date = f"{int(day)} {hijri_month_name(month)}, {year}"
+
     return jsonify({
         'indonesian_date': indonesian_date.strip(),
+        'hijri_date': hijri_date,
         'indonesian_time': indonesian_time.strip(),
         'wita_time': other_times[0].text.strip(),
         'wit_time': other_times[1].text.strip(),
