@@ -1,7 +1,7 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
 import React from 'react';
-import Time from "./Time";
-import "./App.css"
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Time from "../Time/Time";
+import "./App.css";
 
 function App() {
   return (
@@ -12,7 +12,6 @@ function App() {
         </Routes>
       </BrowserRouter>
     </div>
-
   );
 }
 

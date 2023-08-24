@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ruwudu-font {
+  font-family: "Ruwudu";
+}
+
+.viga-font {
+  font-family: "Viga";
+}
+
+@font-face {
+  font-family: "DS-Digital";
+  src: url("../../../public/fonts/DS-DIGI.TTF") format("truetype");
+}
+
+.date-time-information {
+  font-family: "DS-Digital", sans-serif;
+}
+
+.full-width {
+  width: 100vw;
+  box-sizing: border-box;
+}
+
+.hero,
+.hero-content {
+  width: 100%;
+}
+
+.date-time-information,
+.prayer-times,
+.max-w-md {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
