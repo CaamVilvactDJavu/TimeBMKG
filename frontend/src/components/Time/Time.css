@@ -54,8 +54,8 @@
 }
 
 .ticker-content {
-  animation: scrollTicker 20s linear infinite; /* adjust the duration (20s) as needed */
-  padding-left: 100%; /* start from the right side */
+  animation: scrollTicker 20s linear infinite;
+  padding-left: 100%;
 }
 
 .fade-image {
@@ -75,6 +75,10 @@
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.5); /* black with 50% opacity */
-  z-index: 1; /* ensure the overlay is on top */
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.title {
+  letter-spacing: 8px;
 }
