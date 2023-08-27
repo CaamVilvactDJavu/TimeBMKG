@@ -79,7 +79,6 @@ def times():
         indonesian_time = time_container.find(
             'div', {'class': 'FontDigit'}).text
         other_times = time_container.find_all('div', {'class': 'FontDigitU'})
-        english_date = time_container.find('div', {'class': 'FontHariU'}).text
         utc_time = other_times[-1].text
 
     base_url = "http://api.aladhan.com/v1/timingsByCity"
@@ -127,7 +126,6 @@ def times():
         'indonesian_time': indonesian_time.strip(),
         'wita_time': other_times[0].text.strip(),
         'wit_time': other_times[1].text.strip(),
-        'english_date': english_date.strip(),
         'utc_time': utc_time.strip(),
         'prayer_times': prayer_timings,
         'next_prayer': next_prayer,

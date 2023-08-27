@@ -36,3 +36,45 @@
   padding: 0;
   width: 100%;
 }
+
+@keyframes scrollTicker {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.ticker {
+  display: flex;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 8px 0;
+}
+
+.ticker-content {
+  animation: scrollTicker 20s linear infinite; /* adjust the duration (20s) as needed */
+  padding-left: 100%; /* start from the right side */
+}
+
+.fade-image {
+  position: relative;
+  transition: opacity 1s;
+  opacity: 0;
+}
+
+.fade-image.visible {
+  opacity: 1;
+}
+
+.fade-image::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* black with 50% opacity */
+  z-index: 1; /* ensure the overlay is on top */
+}
