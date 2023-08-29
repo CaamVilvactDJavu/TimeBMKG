@@ -73,7 +73,7 @@ function Time() {
                 <div className="title mb-2 text-center text-5xl border-b-4 border-gray-800">
                     Jam Adzan BMKG
                     <div className="text-3xl">Stasiun Geofisika Padang Panjang</div>
-                    <div className="text-2xl">Pusat Gempa Bumi Regional</div>
+                    <div className="text-2xl">Pusat Gempa Bumi Regional VI</div>
                 </div>
                 <div className="mb-2">
                     <div className="text-center text-3xl font-bold">{data.indonesian_time}</div>
@@ -161,7 +161,12 @@ function Time() {
                 </div>
                 <div className="ticker bg-slate-800 rounded-xl p-2 text-white">
                     <div className="ticker-content">
-                        <FontAwesomeIcon icon={faInternetExplorer} /> Website: <a href="https://bmkg.go.id" target="_blank" rel="noopener noreferrer">bmkg.go.id</a> | <FontAwesomeIcon icon={faInstagram} /> Instagram: <a href="https://instagram.com/bmkgpadangpanjang" target="_blank" rel="noopener noreferrer">@bmkgpadangpanjang</a> | <FontAwesomeIcon icon={faTwitter} /> Twitter: <a href="https://twitter.com/bmkgpadangpjg" target="_blank" rel="noopener noreferrer">@bmkgpadangpjg</a> | <FontAwesomeIcon icon={faFacebook} /> Facebook: <a href="https://facebook.com/bmkgpadangpanjang" target="_blank" rel="noopener noreferrer">bmkgpadangpanjang</a>
+                        <FontAwesomeIcon icon={faInternetExplorer} /> <a href="https://bmkg.go.id" target="_blank" rel="noopener noreferrer">https://bmkg.go.id </a>
+                        <FontAwesomeIcon icon={faInstagram} /> <a href="https://instagram.com/bmkgpadangpanjang" target="_blank" rel="noopener noreferrer">@bmkgpadangpanjang </a>
+                        <FontAwesomeIcon icon={faTwitter} /> <a href="https://twitter.com/bmkgpadangpjg" target="_blank" rel="noopener noreferrer">@bmkgpadangpjg </a>
+                        <FontAwesomeIcon icon={faFacebook} /> <a href="https://facebook.com/bmkgpadangpanjang" target="_blank" rel="noopener noreferrer">bmkgpadangpanjang </a> | Sumber :
+                        <a href="https://jam.bmkg.go.id/" target="_blank" rel="noopener noreferrer"> https://jam.bmkg.go.id/</a> ,
+                        <a href="https://data.bmkg.go.id/" target="_blank" rel="noopener noreferrer"> https://data.bmkg.go.id/</a>
                     </div>
                 </div>
             </div>
