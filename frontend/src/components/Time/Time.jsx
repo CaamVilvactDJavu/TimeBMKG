@@ -124,29 +124,28 @@ function Time() {
                     <div className="earthquake-forecast flex flex-col space-y-4 flex-1">
                         <div className="earthquake-info p-4 shadow-md rounded-md">
                             <h3 className="text-lg font-bold mb-2">Gempabumi Dirasakan</h3>
-                            {data.earthquake_info && data.earthquake_info.time ? (
+                            {data.earthquake_info && data.earthquake_info.coordinates ? (
                                 <>
-                                    <div className="info-card  text-sm">
-                                        <strong>Waktu:</strong> {data.earthquake_info.time}
+                                    <div className="info-card text-sm">
+                                        <strong>Waktu:</strong> {data.earthquake_info.time || "N/A"}
                                     </div>
-                                    <div className="info-card  text-sm">
+                                    <div className="info-card text-sm">
                                         <strong>Magnitudo:</strong> {data.earthquake_info.magnitude || "N/A"}
                                     </div>
                                     <div className="info-card text-sm">
                                         <strong>Kedalaman:</strong> {data.earthquake_info.depth || "N/A"}
                                     </div>
-                                    <div className="info-card  text-sm">
+                                    <div className="info-card text-sm">
                                         <strong>Koordinat:</strong> {data.earthquake_info.coordinates || "N/A"}
                                     </div>
-                                    <div className="info-card  text-sm">
+                                    <div className="info-card text-sm">
                                         <strong>Deskripsi:</strong> {data.earthquake_info.description || "N/A"}
                                     </div>
                                 </>
                             ) : (
-                                <p className="text-gray-600">Tidak ada data gempabumi saat ini.</p>
+                                <p className="text-gray-600">{data.earthquake_info.message || "Informasi gempabumi tidak tersedia dalam rentang koordinat yang ditentukan."}</p>
                             )}
                         </div>
-
                         <div className="forecast-container " style={{ scrollLeft: startForecastIndex * 146 }}>
                             {data.weather_forecast && data.weather_forecast.slice(startForecastIndex, startForecastIndex + 5).map((forecast, index) => (
                                 <div key={index} className="forecast-item text-center border-sky-800 border-2 p-2 rounded-md">
@@ -162,7 +161,7 @@ function Time() {
                         </div>
                     </div>
                 </div>
-                <div className="ticker bg-slate-800 rounded-md p-2 text-white">
+                <div className="ticker bg-sky-800 p-2 text-white rounded-md">
                     <div className="ticker-content">
                         <FontAwesomeIcon icon={faInternetExplorer} /> <a href="https://bmkg.go.id" target="_blank" rel="noopener noreferrer">https://bmkg.go.id </a>
                         <FontAwesomeIcon icon={faInstagram} /> <a href="https://instagram.com/bmkgpadangpanjang" target="_blank" rel="noopener noreferrer">@bmkgpadangpanjang </a>

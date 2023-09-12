@@ -27,55 +27,60 @@ def get_earthquake_info():
         driver.get("https://inatews.bmkg.go.id/wrs/index.html")
         soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-    # Fetch earthquake magnitude
-    earthquake_magnitude = soup.find("h1", {"id": "mag"})
-    if earthquake_magnitude:
-        earthquake_magnitude = earthquake_magnitude.text.strip()
-
-    # Fetch earthquake time
-    earthquake_time = soup.find("p", {"id": "timelapse"})
-    if earthquake_time:
-        earthquake_time = earthquake_time.text.split(": ")[1].strip()
-
-    footer_card = soup.find("div", {"class": "card-body px-1"})
-    if not footer_card:
-        print("Error: Footer card not found!")
-        return {}
-
-    earthquake_date = footer_card.find("p", {"id": "tanggal"})
-    if earthquake_date:
-        earthquake_date = earthquake_date.text.split()[-2]
-
-    earthquake_coordinates = footer_card.find("p", {"id": "point"})
+    earthquake_coordinates = soup.find("p", {"id": "point"})
     if earthquake_coordinates:
-        earthquake_coordinates = earthquake_coordinates.text
+        coordinates_text = earthquake_coordinates.text.strip()
+        lon_str, lat_str = coordinates_text.split(", ")
 
-    earthquake_depth = footer_card.find("div", {"id": "depth"})
-    if earthquake_depth:
-        earthquake_depth = earthquake_depth.text
+        # Extract the numeric value of latitude and longitude from the string
+        try:
+            lat = float(lat_str.split(" ")[0])
+            lon = float(lon_str.split(" ")[0])
+        except ValueError:
+            print(
+                f"Error: Could not extract coordinates from {coordinates_text}")
+            return {}
 
-    # Fetch earthquake location
-    # Fetch earthquake description
-    # Fetch earthquake description
-    earthquake_description = soup.find("p", {"id": "deskripsi"})
-    if earthquake_description:
-        earthquake_description = earthquake_description.text.strip()
+        # Check if the coordinates are within the specified range
+        if 0.74 <= lat <= 90 and 0 <= lon <= 100.80 and 'BT' in lon_str and 'LU' in lat_str:
+            earthquake_magnitude = soup.find("h1", {"id": "mag"})
+            if earthquake_magnitude:
+                earthquake_magnitude = earthquake_magnitude.text.strip()
+            earthquake_time = soup.find("p", {"id": "timelapse"})
+            if earthquake_time:
+                earthquake_time = earthquake_time.text.split(": ")[1].strip()
+            footer_card = soup.find("div", {"class": "card-body px-1"})
+            if not footer_card:
+                print("Error: Footer card not found!")
+                return {}
+            earthquake_date = footer_card.find("p", {"id": "tanggal"})
+            if earthquake_date:
+                earthquake_date = earthquake_date.text.split()[-2]
+            earthquake_depth = footer_card.find("div", {"id": "depth"})
+            if earthquake_depth:
+                earthquake_depth = earthquake_depth.text
+            earthquake_description = soup.find("p", {"id": "deskripsi"})
+            if earthquake_description:
+                earthquake_description = earthquake_description.text.strip()
+        else:
+            return {"message": "No earthquake information within the specified range."}
 
-    # Return the captured data as a dictionary
-    return {
-        'time': earthquake_time,
-        'magnitude': earthquake_magnitude,
-        'date': earthquake_date,
-        'depth': earthquake_depth,
-        'coordinates': earthquake_coordinates,
-        'description': earthquake_description
-    }
+        return {
+            'time': earthquake_time,
+            'magnitude': earthquake_magnitude,
+            'date': earthquake_date,
+            'depth': earthquake_depth,
+            'coordinates': coordinates_text,
+            'description': earthquake_description
+        }
+
+    # Return an empty dictionary if the coordinates are not within the specified range
+    return {}
 
 
 def get_weather_forecast():
     soup = BeautifulSoup(get_page_content(), 'html.parser')
     forecasts = []
-
     for item in soup.select(".owl-item .d-flex"):
         forecast_data = {
             "day": item.find("span", {"class": "card-hari"}).text,
@@ -86,19 +91,12 @@ def get_weather_forecast():
             "humidity": item.find("span", {"class": "card-rh"}).text
         }
         forecasts.append(forecast_data)
-
     return forecasts
 
 
 def get_weather_warning():
     soup = BeautifulSoup(get_page_content(), 'html.parser')
-    # If the modal doesn't automatically appear on the page, you might need to trigger it.
-    # This is just an example, modify as needed:
-    # driver.find_element_by_css_selector("CSS_SELECTOR_OF_TRIGGER_BUTTON").click()
-
     modal_content = soup.find('div', {'class': 'modal-content'})
-
-    # Return the text from the modal's body section
     return modal_content.find('div', {'class': 'modal-body'}).text.strip()
 
 
@@ -114,7 +112,6 @@ def get_next_prayer_countdown(current_time, prayer_timings):
     current_time_obj = datetime.strptime(current_time, "%H:%M:%S WIB")
     min_diff = None
     next_prayer = None
-
     for prayer, time in prayer_timings.items():
         prayer_time_obj = datetime.strptime(time.split()[0], "%H:%M")
         if current_time_obj < prayer_time_obj:
@@ -122,7 +119,6 @@ def get_next_prayer_countdown(current_time, prayer_timings):
             if not min_diff or time_diff < min_diff:
                 min_diff = time_diff
                 next_prayer = prayer
-
     return next_prayer, min_diff
 
 
@@ -133,7 +129,6 @@ def times():
             driver.get("http://jam.bmkg.go.id/Jam.BMKG")
             soup = BeautifulSoup(driver.page_source, 'html.parser')
             time_container = soup.find('span', {'id': 'timecontainer'})
-
             indonesian_date = time_container.find(
                 'div', {'class': 'FontHari'}).text
             indonesian_time = time_container.find(
@@ -141,7 +136,6 @@ def times():
             other_times = time_container.find_all(
                 'div', {'class': 'FontDigitU'})
             utc_time = other_times[-1].text
-
         base_url = "http://api.aladhan.com/v1/timingsByCity"
         params = {
             'city': 'Padang Panjang',
@@ -149,21 +143,16 @@ def times():
             'state': 'Sumatera Barat',
             'method': 2
         }
-
         response = requests.get(base_url, params=params)
         prayer_timings = response.json()['data']['timings']
-
         next_prayer, countdown = get_next_prayer_countdown(
             indonesian_time.strip(), prayer_timings)
-
         hijri_raw = response.json()['data']['date']['hijri']['date']
         day, month, year = hijri_raw.split('-')
         hijri_date = f"{int(day)} {hijri_month_name(month)}, {year}"
-
         weather_warning = get_weather_warning()
         weather_forecast = get_weather_forecast()
         earthquake_info = get_earthquake_info()
-
         return jsonify({
             'indonesian_date': indonesian_date.strip(),
             'hijri_date': hijri_date,
@@ -178,7 +167,6 @@ def times():
             'weather_forecast': weather_forecast,
             'earthquake_info': earthquake_info,
         })
-
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
