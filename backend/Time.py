@@ -14,12 +14,79 @@ chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 
 
+def get_earthquake_info():
+    with webdriver.Chrome(options=chrome_options) as driver:
+        driver.get("https://mhews.bmkg.go.id/sumatera-barat-forecast")
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+        lindu_container = soup.find('div', class_='lindu')
+
+        # Check if lindu_container exists
+        if not lindu_container:
+            return {}
+
+        earthquake_time = lindu_container.find(
+            'h5', class_='text-center text-white mb-1')
+        earthquake_magnitude_img = lindu_container.find(
+            'img', src="https://warning.bmkg.go.id/img/magnitude.png")
+        earthquake_depth_img = lindu_container.find(
+            'img', src="https://warning.bmkg.go.id/img/kedalaman.png")
+        earthquake_coordinates_img = lindu_container.find(
+            'img', src="https://warning.bmkg.go.id/img/koordinat.png")
+        earthquake_location_p = lindu_container.find('p', class_='par')
+
+        # Return the captured data as a dictionary
+        return {
+            'time': earthquake_time.text if earthquake_time else None,
+            'magnitude': earthquake_magnitude_img.next_sibling.next_sibling.text if earthquake_magnitude_img and earthquake_magnitude_img.next_sibling and earthquake_magnitude_img.next_sibling.next_sibling else None,
+            'depth': earthquake_depth_img.next_sibling.next_sibling.text if earthquake_depth_img and earthquake_depth_img.next_sibling and earthquake_depth_img.next_sibling.next_sibling else None,
+            'coordinates': earthquake_coordinates_img.next_sibling.next_sibling.text if earthquake_coordinates_img and earthquake_coordinates_img.next_sibling and earthquake_coordinates_img.next_sibling.next_sibling else None,
+            'location': earthquake_location_p.text.split("Lokasi Gempa")[1].strip() if earthquake_location_p else None
+        }
+
+
 def hijri_month_name(month_number):
     hijri_months = [
         "Muharram", "Safar", "Rabi' al-awwal", "Rabi' al-Thani", "Jumada al-awwal",
         "Jumada al-Thani", "Rajab", "Sha'ban", "Ramadan", "Shawwal", "Dhul-Qi'dah", "Dhul-Hijjah"
     ]
     return hijri_months[int(month_number) - 1]
+
+
+def get_weather_forecast():
+    with webdriver.Chrome(options=chrome_options) as driver:
+        driver.get("https://mhews.bmkg.go.id/sumatera-barat-forecast")
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+        forecasts = []
+
+        for item in soup.select(".owl-item .d-flex"):
+            forecast_data = {
+                "day": item.find("span", {"class": "card-hari"}).text,
+                "time": item.find("span", {"class": "card-waktu"}).text,
+                "image": item.find("span", {"class": "card-img"}).img["src"],
+                "condition": item.find("span", {"class": "card-kondisi"}).text,
+                "temperature": item.find("span", {"class": "card-suhu"}).text,
+                "humidity": item.find("span", {"class": "card-rh"}).text
+            }
+            forecasts.append(forecast_data)
+
+        return forecasts
+
+
+def get_weather_warning():
+    with webdriver.Chrome(options=chrome_options) as driver:
+        driver.get("https://mhews.bmkg.go.id/sumatera-barat-forecast")
+
+        # If the modal doesn't automatically appear on the page, you might need to trigger it.
+        # This is just an example, modify as needed:
+        # driver.find_element_by_css_selector("CSS_SELECTOR_OF_TRIGGER_BUTTON").click()
+
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        modal_content = soup.find('div', {'class': 'modal-content'})
+
+        # Return the text from the modal's body section
+        return modal_content.find('div', {'class': 'modal-body'}).text.strip()
 
 
 def get_next_prayer_countdown(current_time, prayer_timings):
@@ -41,35 +108,6 @@ def get_next_prayer_countdown(current_time, prayer_timings):
 @app.route('/times', methods=['GET'])
 def times():
     with webdriver.Chrome(options=chrome_options) as driver:
-
-        earthquake_response = requests.get(
-            "https://data.bmkg.go.id/DataMKG/TEWS/autogempa.xml")
-        earthquake_soup = BeautifulSoup(earthquake_response.content, 'xml')
-        gempa_data = earthquake_soup.find('gempa')
-
-        earthquake_info = {
-            'Tanggal': gempa_data.find('Tanggal').text,
-            'Jam': gempa_data.find('Jam').text,
-            'DateTime': gempa_data.find('DateTime').text,
-            'Coordinates': gempa_data.find('coordinates').text,
-            'Lintang': gempa_data.find('Lintang').text,
-            'Bujur': gempa_data.find('Bujur').text,
-            'Magnitude': gempa_data.find('Magnitude').text,
-            'Kedalaman': gempa_data.find('Kedalaman').text,
-            'Wilayah': gempa_data.find('Wilayah').text,
-            'Potensi': gempa_data.find('Potensi').text,
-            'Dirasakan': gempa_data.find('Dirasakan').text,
-            'Shakemap': gempa_data.find('Shakemap').text
-        }
-
-        forecast_response = requests.get(
-            "https://data.bmkg.go.id/DataMKG/MEWS/DigitalForecast/DigitalForecast-SumateraBarat.xml")
-
-        forecast_soup = BeautifulSoup(forecast_response.content, 'xml')
-
-        padangpanjang_data = forecast_soup.find(
-            'area', {'description': 'Padangpanjang'})
-
         driver.get("http://jam.bmkg.go.id/Jam.BMKG")
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         time_container = soup.find('span', {'id': 'timecontainer'})
@@ -99,26 +137,9 @@ def times():
     day, month, year = hijri_raw.split('-')
     hijri_date = f"{int(day)} {hijri_month_name(month)}, {year}"
 
-    weather = {}
-
-    if padangpanjang_data:
-        temperature_data = padangpanjang_data.find('parameter', {'id': 'tmax'})
-        humidity_data = padangpanjang_data.find('parameter', {'id': 'humax'})
-
-        if temperature_data:
-            temperature_value_C = temperature_data.find('value', {'unit': 'C'})
-            temperature_value_F = temperature_data.find('value', {'unit': 'F'})
-
-            if temperature_value_C:
-                weather['temperature_C'] = temperature_value_C.text
-
-            if temperature_value_F:
-                weather['temperature_F'] = temperature_value_F.text
-
-        if humidity_data:
-            humidity_value = humidity_data.find('value', {'unit': '%'})
-            if humidity_value:
-                weather['humidity'] = humidity_value.text
+    weather_warning = get_weather_warning()
+    weather_forecast = get_weather_forecast()
+    earthquake_info = get_earthquake_info()
 
     return jsonify({
         'indonesian_date': indonesian_date.strip(),
@@ -130,8 +151,9 @@ def times():
         'prayer_times': prayer_timings,
         'next_prayer': next_prayer,
         'countdown': str(countdown),
-        'weather_forecast': weather,
-        'earthquake': earthquake_info
+        'weather_warning': weather_warning,
+        'weather_forecast': weather_forecast,
+        'earthquake_info': earthquake_info
     })
 
 

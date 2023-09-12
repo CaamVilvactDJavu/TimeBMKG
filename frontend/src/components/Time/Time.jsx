@@ -2,11 +2,26 @@ import React, { useState, useEffect, useRef } from 'react';
 import "./Time.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faTwitter, faFacebook, faInternetExplorer } from '@fortawesome/free-brands-svg-icons';
-import { faTemperatureLow, faTint } from '@fortawesome/free-solid-svg-icons';
-import { faCalendarAlt, faClock, faMapMarked, faRulerVertical, faWaveSquare, faExclamationTriangle, faCity } from '@fortawesome/free-solid-svg-icons';
 
 function Time() {
-    const [data, setData] = useState({});
+    const [data, setData] = useState({ weather_warning: "", earthquake_info: {} });
+    const [startForecastIndex, setStartForecastIndex] = useState(0);
+
+    useEffect(() => {
+        if (!data.weather_forecast) return;
+
+        const forecastInterval = setInterval(() => {
+            setStartForecastIndex((prevIndex) => {
+                if (prevIndex + 5 >= data.weather_forecast.length) {
+                    return 0; // Reset to the start if we've reached the end.
+                }
+                return prevIndex + 5;
+            });
+        }, 10000);
+
+        return () => clearInterval(forecastInterval);
+    }, [data.weather_forecast]);
+
     const [lastPrayer, setLastPrayer] = useState(null);
     const audioRef = useRef(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -64,102 +79,75 @@ function Time() {
     };
 
     const nextPrayer = determineNextPrayer();
+
     return (
         <div className='w-full h-screen flex items-center justify-center viga-font'>
             <audio ref={audioRef} src="../../../assets/Adzan.mp3" preload="auto"></audio>
-            <div className={`flex-none w-1/3 min-h-screen bg-gray-200 fade-image ${isImageVisible ? 'visible' : ''}`} style={{ backgroundImage: `url(${imageList[currentImageIndex]})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-            </div>
+            <div className={`flex-none w-1/3 min-h-screen bg-gray-200 fade-image ${isImageVisible ? 'visible' : ''}`} style={{ backgroundImage: `url(${imageList[currentImageIndex]})`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
             <div className="flex-1 flex flex-col justify-between p-4">
-                <div className="title mb-2 text-center text-5xl border-b-4 border-gray-800">
+                <div className="title mb-2 text-center text-4xl border-b-2 border-gray-800">
                     Jam Adzan BMKG
-                    <div className="text-3xl">Stasiun Geofisika Padang Panjang</div>
-                    <div className="text-2xl">Pusat Gempa Bumi Regional VI</div>
+                    <div className="text-2xl">Stasiun Geofisika Padang Panjang</div>
+                    <div className="text-xl">Pusat Gempa Bumi Regional VI</div>
                 </div>
                 <div className="mb-2">
-                    <div className="text-center text-3xl font-bold">{data.indonesian_time}</div>
-                    <div className="text-center text-3xl font-bold">{data.wita_time}</div>
-                    <div className="text-center text-3xl font-bold">{data.wit_time}</div>
-                    <div className="flex justify-between text-2xl font-bold">
+                    <div className="text-center text-2xl font-bold">{data.indonesian_time}</div>
+                    <div className="text-center text-2xl font-bold">{data.wita_time}</div>
+                    <div className="text-center text-2xl font-bold">{data.wit_time}</div>
+                    <div className="flex justify-between text-xl font-bold">
                         <div>{data.indonesian_date}</div>
                         <div>{data.hijri_date}</div>
                     </div>
                 </div>
-                <div className="flex justify-between items-center text-xl font-bold mb-4 p-4 viga-font shadow-2xl rounded-xl">
+                <div className="flex justify-between items-center text-lg font-bold mb-4 p-4 viga-font shadow-md rounded-md">
                     {[['Fajr', '../../images/icons/fajr.png'], ['Dhuhr', '../../images/icons/dhuhr.png'], ['Asr', '../../images/icons/asr.png'], ['Maghrib', '../../images/icons/maghrib.png'], ['Isha', '../../images/icons/isha.png']].map(([prayer, icon]) => (
-                        <div key={prayer} className={`flex flex-col items-center ${prayer === nextPrayer ? 'bg-green-700 text-white rounded-xl px-8' : ''} p-2`}>
-                            <img src={icon} alt={`${prayer} Icon`} className="w-8 h-8 mb-2" />
+                        <div key={prayer} className={`flex flex-col items-center ${prayer === nextPrayer ? 'bg-green-700 text-white rounded-md px-6' : ''} p-2`}>
+                            <img src={icon} alt={`${prayer} Icon`} className="w-6 h-6 mb-2" />
                             <div>{prayer}</div>
                             <div>{data.prayer_times && data.prayer_times[prayer]}</div>
                         </div>
                     ))}
-                    <div className="text-center border-l-4 border-gray-900 px-4">
+                    <div className="text-center border-l-2 border-gray-900 px-3">
                         <span>Next Prayer: </span>
                         <span className='font-bold'>{data.next_prayer}</span>
                         <div className='text-md font-bold'>-{data.countdown}</div>
                     </div>
                 </div>
-                <div className="my-4 flex-grow flex backdrop-blur-md shadow-2xl border-l-8 border-gray-800 rounded-xl">
-                    <p className="ruwudu-font text-xl p-4">وَاسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ وَإِنَّهَا لَكَبِيرَةٌ إِلَّا عَلَى الْخَاشِعِينَ<br />“Dan mohonlah pertolongan (kepada Allah) melalui sabar dan shalat. Dan (shalat) itu sungguh berat, kecuali bagi orang-orang yang khusyuk.”</p>
+                <div className="my-4 flex-grow flex backdrop-blur-md shadow-md border-l-4 border-gray-800 rounded-md">
+                    <p className="ruwudu-font text-lg p-3">وَاسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ وَإِنَّهَا لَكَبِيرَةٌ إِلَّا عَلَى الْخَاشِعِينَ<br />“Dan مhonlah pertolongan (kepada Allah) melalui sabar dan shalat. Dan (shalat) itu sungguh berat, kecuali bagi orang-orang yang khusyuk.”</p>
                 </div>
-                <div className="flex justify-between mb-4 text-base">
-                    <div className="flex space-x-4 w-full">
-                        <div className="space-y-4 flex-1 ml-2 p-4 card bg-white shadow-md rounded-xl">
-                            <h2 className="text-2xl font-semibold mb-3">Earthquake Info</h2>
-                            <div className="space-y-1">
-                                <div className="flex items-center text-md text-gray-700 mb-2">
-                                    <FontAwesomeIcon icon={faCalendarAlt} className="text-blue-500 mr-3 h-5 w-5" />
-                                    Date: {data.earthquake?.Tanggal}
-                                </div>
-                                <div className="flex items-center text-md text-gray-700 mb-2">
-                                    <FontAwesomeIcon icon={faClock} className="text-green-500 mr-3 h-5 w-5" />
-                                    Time: {data.earthquake?.Jam}
-                                </div>
-                                <div className="flex items-center text-md text-gray-700 mb-2">
-                                    <FontAwesomeIcon icon={faWaveSquare} className="text-red-500 mr-3 h-5 w-5" />
-                                    Magnitude: {data.earthquake?.Magnitude}
-                                </div>
-                                <div className="flex items-center text-md text-gray-700 mb-2">
-                                    <FontAwesomeIcon icon={faRulerVertical} className="text-purple-500 mr-3 h-5 w-5" />
-                                    Depth: {data.earthquake?.Kedalaman}
-                                </div>
-                                <div className="flex items-center text-md text-gray-700 mb-2">
-                                    <FontAwesomeIcon icon={faMapMarked} className="text-orange-500 mr-3 h-5 w-5" />
-                                    Location: {data.earthquake?.Wilayah}
-                                </div>
-                                <div className="flex items-center text-md text-gray-700 mb-2">
-                                    <FontAwesomeIcon icon={faExclamationTriangle} className="text-yellow-500 mr-3 h-5 w-5" />
-                                    Potency: {data.earthquake?.Potensi}
-                                </div>
-                                <div className="flex items-center text-md text-gray-700 mb-2">
-                                    <FontAwesomeIcon icon={faCity} className="text-teal-500 mr-3 h-5 w-5" />
-                                    Felt in: {data.earthquake?.Dirasakan}
-                                </div>
-                            </div>
+                <div className="info-sections my-4 flex flex-row space-x-4">
+                    <div className="weather-warning p-4 shadow-md rounded-md flex-1">
+                        <h3 className="text-lg font-bold mb-2">Weather Warning</h3>
+                        <p className=" text-xs text-justify">{data.weather_warning}</p>
+                    </div>
+                    <div className="earthquake-forecast flex flex-col space-y-4 flex-1">
+                        <div className="earthquake-info p-4 shadow-md rounded-md">
+                            <h3 className="text-lg font-bold mb-2">Earthquake Information</h3>
+                            {data.earthquake_info && (
+                                <>
+                                    <p><strong>Time:</strong> {data.earthquake_info.time || "N/A"}</p>
+                                    <p><strong>Magnitude:</strong> {data.earthquake_info.magnitude || "N/A"}</p>
+                                    <p><strong>Depth:</strong> {data.earthquake_info.depth || "N/A"}</p>
+                                    <p><strong>Coordinates:</strong> {data.earthquake_info.coordinates || "N/A"}</p>
+                                    <p><strong>Location:</strong> {data.earthquake_info.location || "N/A"}</p>
+                                </>
+                            )}
                         </div>
-                        <div className="space-y-4 flex-1 ml-2 p-4 card bg-white shadow-md rounded-xl">
-                            <h2 className="text-2xl font-semibold mb-3">Weather Forecast</h2>
-                            <div className="flex items-center justify-between mb-4 text-lg text-gray-700">
-                                <div className="flex items-center">
-                                    <FontAwesomeIcon icon={faTemperatureLow} className="text-red-400 mr-3 h-5 w-5" />
-                                    Temperature
+                        <div className="forecast-container p-4 shadow-md rounded-md" style={{ scrollLeft: startForecastIndex * 146 }}>
+                            {data.weather_forecast && data.weather_forecast.slice(startForecastIndex, startForecastIndex + 5).map((forecast, index) => (
+                                <div key={index} className="forecast-item">
+                                    <p className="text-sm">{forecast.day}, {forecast.time}</p>
+                                    <img src={forecast.image} alt={forecast.condition} style={{ width: "80%" }} />
+                                    <p className="text-xs">{forecast.condition}</p>
+                                    <p className="text-xs">Temperature: {forecast.temperature}</p>
+                                    <p className="text-xs">Humidity: {forecast.humidity}</p>
                                 </div>
-                                <div>
-                                    {data.weather_forecast?.temperature_C}°C / {data.weather_forecast?.temperature_F}°F
-                                </div>
-                            </div>
-                            <div className="flex items-center justify-between text-lg text-gray-700">
-                                <div className="flex items-center">
-                                    <FontAwesomeIcon icon={faTint} className="text-blue-400 mr-3 h-5 w-5" />
-                                    Humidity
-                                </div>
-                                <div>
-                                    {data.weather_forecast?.humidity}%
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
                 </div>
-                <div className="ticker bg-slate-800 rounded-xl p-2 text-white">
+                <div className="ticker bg-slate-800 rounded-md p-2 text-white">
                     <div className="ticker-content">
                         <FontAwesomeIcon icon={faInternetExplorer} /> <a href="https://bmkg.go.id" target="_blank" rel="noopener noreferrer">https://bmkg.go.id </a>
                         <FontAwesomeIcon icon={faInstagram} /> <a href="https://instagram.com/bmkgpadangpanjang" target="_blank" rel="noopener noreferrer">@bmkgpadangpanjang </a>

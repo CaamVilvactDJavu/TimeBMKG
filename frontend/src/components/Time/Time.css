@@ -82,3 +82,34 @@
 .title {
   letter-spacing: 8px;
 }
+
+.weather-warning,
+.earthquake-info {
+  max-height: calc(50% - 10px);
+  overflow-y: auto;
+}
+
+.forecast-container {
+  display: flex;
+  overflow-x: scroll;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 730px;
+}
+
+.forecast-item {
+  flex: none;
+  width: 20%;
+  margin-right: 10px;
+  display: inline-block;
+  animation: scrollLeft 10s linear infinite;
+}
+
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
