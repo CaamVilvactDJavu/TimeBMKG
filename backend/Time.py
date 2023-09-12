@@ -23,30 +23,52 @@ def get_page_content():
 
 
 def get_earthquake_info():
-    soup = BeautifulSoup(get_page_content(), 'html.parser')
-    lindu_container = soup.find('div', class_='lindu')
+    with webdriver.Chrome(options=chrome_options) as driver:
+        driver.get("https://inatews.bmkg.go.id/wrs/index.html")
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-    # Check if lindu_container exists
-    if not lindu_container:
+    # Fetch earthquake magnitude
+    earthquake_magnitude = soup.find("h1", {"id": "mag"})
+    if earthquake_magnitude:
+        earthquake_magnitude = earthquake_magnitude.text.strip()
+
+    # Fetch earthquake time
+    earthquake_time = soup.find("p", {"id": "timelapse"})
+    if earthquake_time:
+        earthquake_time = earthquake_time.text.split(": ")[1].strip()
+
+    footer_card = soup.find("div", {"class": "card-body px-1"})
+    if not footer_card:
+        print("Error: Footer card not found!")
         return {}
 
-    earthquake_time = lindu_container.find(
-        'h5', class_='text-center text-white mb-1')
-    earthquake_magnitude_img = lindu_container.find(
-        'img', src="https://warning.bmkg.go.id/img/magnitude.png")
-    earthquake_depth_img = lindu_container.find(
-        'img', src="https://warning.bmkg.go.id/img/kedalaman.png")
-    earthquake_coordinates_img = lindu_container.find(
-        'img', src="https://warning.bmkg.go.id/img/koordinat.png")
-    earthquake_location_p = lindu_container.find('p', class_='par')
+    earthquake_date = footer_card.find("p", {"id": "tanggal"})
+    if earthquake_date:
+        earthquake_date = earthquake_date.text.split()[-2]
+
+    earthquake_coordinates = footer_card.find("p", {"id": "point"})
+    if earthquake_coordinates:
+        earthquake_coordinates = earthquake_coordinates.text
+
+    earthquake_depth = footer_card.find("div", {"id": "depth"})
+    if earthquake_depth:
+        earthquake_depth = earthquake_depth.text
+
+    # Fetch earthquake location
+    # Fetch earthquake description
+    # Fetch earthquake description
+    earthquake_description = soup.find("p", {"id": "deskripsi"})
+    if earthquake_description:
+        earthquake_description = earthquake_description.text.strip()
 
     # Return the captured data as a dictionary
     return {
-        'time': earthquake_time.text if earthquake_time else None,
-        'magnitude': earthquake_magnitude_img.next_sibling.next_sibling.text if earthquake_magnitude_img and earthquake_magnitude_img.next_sibling and earthquake_magnitude_img.next_sibling.next_sibling else None,
-        'depth': earthquake_depth_img.next_sibling.next_sibling.text if earthquake_depth_img and earthquake_depth_img.next_sibling and earthquake_depth_img.next_sibling.next_sibling else None,
-        'coordinates': earthquake_coordinates_img.next_sibling.next_sibling.text if earthquake_coordinates_img and earthquake_coordinates_img.next_sibling and earthquake_coordinates_img.next_sibling.next_sibling else None,
-        'location': earthquake_location_p.text.split("Lokasi Gempa")[1].strip() if earthquake_location_p else None
+        'time': earthquake_time,
+        'magnitude': earthquake_magnitude,
+        'date': earthquake_date,
+        'depth': earthquake_depth,
+        'coordinates': earthquake_coordinates,
+        'description': earthquake_description
     }
 
 
@@ -154,7 +176,7 @@ def times():
             'countdown': str(countdown),
             'weather_warning': weather_warning,
             'weather_forecast': weather_forecast,
-            'earthquake_info': earthquake_info
+            'earthquake_info': earthquake_info,
         })
 
     except Exception as e:

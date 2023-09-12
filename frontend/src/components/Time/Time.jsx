@@ -124,17 +124,30 @@ function Time() {
                     <div className="earthquake-forecast flex flex-col space-y-4 flex-1">
                         <div className="earthquake-info p-4 shadow-md rounded-md">
                             <h3 className="text-lg font-bold mb-2">Gempabumi Dirasakan</h3>
-                            {data.earthquake_info && (
+                            {data.earthquake_info && data.earthquake_info.time ? (
                                 <>
-                                    <p><strong>Time:</strong> {data.earthquake_info.time || "N/A"}</p>
-                                    <p><strong>Magnitudo:</strong> {data.earthquake_info.magnitude || "N/A"}</p>
-                                    <p><strong>Kedalaman:</strong> {data.earthquake_info.depth || "N/A"}</p>
-                                    <p><strong>Koordinat:</strong> {data.earthquake_info.coordinates || "N/A"}</p>
-                                    <p><strong>Lokasi:</strong> {data.earthquake_info.location || "N/A"}</p>
+                                    <div className="info-card  text-sm">
+                                        <strong>Waktu:</strong> {data.earthquake_info.time}
+                                    </div>
+                                    <div className="info-card  text-sm">
+                                        <strong>Magnitudo:</strong> {data.earthquake_info.magnitude || "N/A"}
+                                    </div>
+                                    <div className="info-card text-sm">
+                                        <strong>Kedalaman:</strong> {data.earthquake_info.depth || "N/A"}
+                                    </div>
+                                    <div className="info-card  text-sm">
+                                        <strong>Koordinat:</strong> {data.earthquake_info.coordinates || "N/A"}
+                                    </div>
+                                    <div className="info-card  text-sm">
+                                        <strong>Deskripsi:</strong> {data.earthquake_info.description || "N/A"}
+                                    </div>
                                 </>
+                            ) : (
+                                <p className="text-gray-600">Tidak ada data gempabumi saat ini.</p>
                             )}
                         </div>
-                        <div className="forecast-container p-4" style={{ scrollLeft: startForecastIndex * 146 }}>
+
+                        <div className="forecast-container " style={{ scrollLeft: startForecastIndex * 146 }}>
                             {data.weather_forecast && data.weather_forecast.slice(startForecastIndex, startForecastIndex + 5).map((forecast, index) => (
                                 <div key={index} className="forecast-item text-center border-sky-800 border-2 p-2 rounded-md">
                                     <p className="text-sm text-center">{forecast.day}, {forecast.time}</p>

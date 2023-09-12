@@ -113,3 +113,17 @@
     transform: translateX(-100%);
   }
 }
+
+.earthquake-map {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.earthquake-map iframe,
+.earthquake-map img {
+  transform: scale(0.5); /* scale down the content */
+}
