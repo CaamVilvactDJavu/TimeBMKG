@@ -32,7 +32,6 @@ def get_earthquake_info():
         coordinates_text = earthquake_coordinates.text.strip()
         lon_str, lat_str = coordinates_text.split(", ")
 
-        # Extract the numeric value of latitude and longitude from the string
         try:
             lat = float(lat_str.split(" ")[0])
             lon = float(lon_str.split(" ")[0])
@@ -41,7 +40,6 @@ def get_earthquake_info():
                 f"Error: Could not extract coordinates from {coordinates_text}")
             return {}
 
-        # Check if the coordinates are within the specified range
         if 0.74 <= lat <= 90 and 0 <= lon <= 100.80 and 'BT' in lon_str and 'LU' in lat_str:
             earthquake_magnitude = soup.find("h1", {"id": "mag"})
             if earthquake_magnitude:
@@ -74,7 +72,6 @@ def get_earthquake_info():
             'description': earthquake_description
         }
 
-    # Return an empty dictionary if the coordinates are not within the specified range
     return {}
 
 
