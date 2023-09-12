@@ -114,34 +114,36 @@ function Time() {
                     </div>
                 </div>
                 <div className="my-4 flex-grow flex backdrop-blur-md shadow-md border-l-4 border-gray-800 rounded-md">
-                    <p className="ruwudu-font text-lg p-3">وَاسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ وَإِنَّهَا لَكَبِيرَةٌ إِلَّا عَلَى الْخَاشِعِينَ<br />“Dan مhonlah pertolongan (kepada Allah) melalui sabar dan shalat. Dan (shalat) itu sungguh berat, kecuali bagi orang-orang yang khusyuk.”</p>
+                    <p className="ruwudu-font text-lg p-3">وَٱسْتَعِينُوا۟ بِٱلصَّبْرِ وَٱلصَّلَوٰةِ ۚ وَإِنَّهَا لَكَبِيرَةٌ إِلَّا عَلَى ٱلْخَٰشِعِينَ<br />"Dan mohonlah pertolongan (kepada Allah) dengan sabar dan shalat. Dan (shalat) itu sungguh berat, kecuali bagi orang-orang yang khusyuk"</p>
                 </div>
                 <div className="info-sections my-4 flex flex-row space-x-4">
                     <div className="weather-warning p-4 shadow-md rounded-md flex-1">
-                        <h3 className="text-lg font-bold mb-2">Weather Warning</h3>
+                        <h3 className="text-lg font-bold mb-2">Peringatan Dini Cuaca Sumatera Barat</h3>
                         <p className=" text-xs text-justify">{data.weather_warning}</p>
                     </div>
                     <div className="earthquake-forecast flex flex-col space-y-4 flex-1">
                         <div className="earthquake-info p-4 shadow-md rounded-md">
-                            <h3 className="text-lg font-bold mb-2">Earthquake Information</h3>
+                            <h3 className="text-lg font-bold mb-2">Gempabumi Dirasakan</h3>
                             {data.earthquake_info && (
                                 <>
                                     <p><strong>Time:</strong> {data.earthquake_info.time || "N/A"}</p>
-                                    <p><strong>Magnitude:</strong> {data.earthquake_info.magnitude || "N/A"}</p>
-                                    <p><strong>Depth:</strong> {data.earthquake_info.depth || "N/A"}</p>
-                                    <p><strong>Coordinates:</strong> {data.earthquake_info.coordinates || "N/A"}</p>
-                                    <p><strong>Location:</strong> {data.earthquake_info.location || "N/A"}</p>
+                                    <p><strong>Magnitudo:</strong> {data.earthquake_info.magnitude || "N/A"}</p>
+                                    <p><strong>Kedalaman:</strong> {data.earthquake_info.depth || "N/A"}</p>
+                                    <p><strong>Koordinat:</strong> {data.earthquake_info.coordinates || "N/A"}</p>
+                                    <p><strong>Lokasi:</strong> {data.earthquake_info.location || "N/A"}</p>
                                 </>
                             )}
                         </div>
-                        <div className="forecast-container p-4 shadow-md rounded-md" style={{ scrollLeft: startForecastIndex * 146 }}>
+                        <div className="forecast-container p-4" style={{ scrollLeft: startForecastIndex * 146 }}>
                             {data.weather_forecast && data.weather_forecast.slice(startForecastIndex, startForecastIndex + 5).map((forecast, index) => (
-                                <div key={index} className="forecast-item">
-                                    <p className="text-sm">{forecast.day}, {forecast.time}</p>
-                                    <img src={forecast.image} alt={forecast.condition} style={{ width: "80%" }} />
-                                    <p className="text-xs">{forecast.condition}</p>
-                                    <p className="text-xs">Temperature: {forecast.temperature}</p>
-                                    <p className="text-xs">Humidity: {forecast.humidity}</p>
+                                <div key={index} className="forecast-item text-center border-sky-800 border-2 p-2 rounded-md">
+                                    <p className="text-sm text-center">{forecast.day}, {forecast.time}</p>
+                                    <div className="flex flex-col items-center">
+                                        <img src={forecast.image} alt={forecast.condition} className="w-4/5 p-3" />
+                                        <p className="text-xs">{forecast.condition}</p>
+                                    </div>
+                                    <p className="text-xs">Suhu: {forecast.temperature}</p>
+                                    <p className="text-xs">Kelembaban: {forecast.humidity}</p>
                                 </div>
                             ))}
                         </div>
