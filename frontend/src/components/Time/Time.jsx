@@ -13,7 +13,7 @@ function Time() {
         const forecastInterval = setInterval(() => {
             setStartForecastIndex((prevIndex) => {
                 if (prevIndex + 5 >= data.weather_forecast.length) {
-                    return 0; // Reset to the start if we've reached the end.
+                    return 0;
                 }
                 return prevIndex + 5;
             });
